@@ -56,3 +56,5 @@ class PostAdmin(admin.ModelAdmin):
         obj.owner=request.user
         return super(PostAdmin,self).save_model(request,obj,form,change)
 
+admin.site.site_header='XX后台登录页面'
+admin.site.site_title='XX管理'
