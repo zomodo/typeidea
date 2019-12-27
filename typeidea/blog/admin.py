@@ -44,20 +44,49 @@ class CategoryOwnerFilter(admin.SimpleListFilter):
 
 @admin.register(Post)
 class PostAdmin(admin.ModelAdmin):
+
     list_display = ('title','category','status','owner','created_time','operator')
     list_display_links = ()
     list_filter = (CategoryOwnerFilter,)
     search_fields = ('title','category__name')
     actions_on_top = True
     actions_on_bottom = True
+    save_on_top = True  # 在顶部显示保存功能
 
-    save_on_top = True
-    fields = (
-        ('category','title'),
-        'desc',
-        'status',
-        'content',
-        'tag',
+    """ 只针对多对多的情况 horizontal：横向、vertical：纵向 """
+    filter_horizontal = ('tag',)
+    # filter_vertical = ('tag',)
+
+    # exclude = ('owner',)        # exclude指定哪些字段不展示
+    # fields限定要展示的字段，配置展示字段顺序
+    # fields = (
+    #     ('category','title'),
+    #     'desc',
+    #     'status',
+    #     'content',
+    #     'tag',
+    # )
+
+    # fieldsets 控制页面布局
+    """ fieldsets中是元祖，元祖中第一个元素是string，第二个元素是dict，而dict的key可以是'fields','description','classes'  """
+    fieldsets = (
+        ('基础配置',{
+            'description':'基础配置描述',
+            'fields':(
+                ('title','category'),
+                'status',
+            ),
+        }),
+        ('内容',{
+            'fields':(
+                'desc',
+                'content',
+            ),
+        }),
+        ('其他信息',{
+            'fields':('tag',),
+            'classes':('collapse',),
+        }),
     )
 
     def operator(self,obj):         # 自定义函数-list_display处增加一列“编辑”
@@ -74,6 +103,11 @@ class PostAdmin(admin.ModelAdmin):
     def get_queryset(self, request):            # 重写get_queryset函数，当前登陆用户只能看到自己的文章
         qs=super(PostAdmin,self).get_queryset(request)
         return qs.filter(owner=request.user)
+
+    # 可以自定义Media类添加js和css资源，改变后台样式
+    # class Media:
+    #     css={"all":("https://cdn.bootcss.com/twitter-bootstrap/4.3.1/css/bootstrap.min.css",),}
+    #     js=("https://cdn.bootcss.com/twitter-bootstrap/4.3.1/js/bootstrap.bundle.js",)
 
 admin.site.site_header='XX后台登录页面'
 admin.site.site_title='XX管理'
