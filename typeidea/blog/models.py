@@ -62,5 +62,3 @@ class Post(models.Model):
         verbose_name=verbose_name_plural='文章'
         ordering=['-id']        # 根据id降序
 
-
-
