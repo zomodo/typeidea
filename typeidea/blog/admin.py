@@ -2,10 +2,19 @@ from django.contrib import admin
 from .models import Post,Tag,Category
 from django.urls import reverse
 from django.utils.html import format_html
+from .adminforms import PostAdminForm
+from typeidea.custom_site import custom_site
 # Register your models here.
 
-@admin.register(Category)
+class PostInline(admin.TabularInline):      # stackedinline样式不同,设置在其他页直接编辑 修改文章
+    fields = ('title','desc')
+    extra = 1   # 控制额外多几个
+    model = Post
+
+@admin.register(Category,site=custom_site)
 class CategoryAdmin(admin.ModelAdmin):
+    inlines = [PostInline,]                 # 在分类页直接编辑/修改文章
+
     list_display = ('name','status','is_nav','owner','created_time','post_count')
     fields = ('name','status','is_nav')
 
@@ -18,7 +27,7 @@ class CategoryAdmin(admin.ModelAdmin):
     post_count.short_description = '文章数量'   # 指定表头名称
 
 
-@admin.register(Tag)
+@admin.register(Tag,site=custom_site)
 class TagAdmin(admin.ModelAdmin):
     list_display = ('name','status','owner','created_time')
     fields = ('name','status')
@@ -42,8 +51,9 @@ class CategoryOwnerFilter(admin.SimpleListFilter):
             return queryset.filter(category_id=self.value())
         return queryset
 
-@admin.register(Post)
+@admin.register(Post,site=custom_site)
 class PostAdmin(admin.ModelAdmin):
+    form = PostAdminForm        # 引入了自定义的adminforms的PostAdminForm,desc的字段由charfield变成了textarea
 
     list_display = ('title','category','status','owner','created_time','operator')
     list_display_links = ()
@@ -92,7 +102,7 @@ class PostAdmin(admin.ModelAdmin):
     def operator(self,obj):         # 自定义函数-list_display处增加一列“编辑”
         return format_html(
             "<a href='{}'>编辑</a>",
-            reverse("admin:blog_post_change",args=(obj.id,))
+            reverse("cus_admin:blog_post_change",args=(obj.id,))
         )
     operator.short_description = '操作'       # 指定表头名称
 
@@ -109,5 +119,6 @@ class PostAdmin(admin.ModelAdmin):
     #     css={"all":("https://cdn.bootcss.com/twitter-bootstrap/4.3.1/css/bootstrap.min.css",),}
     #     js=("https://cdn.bootcss.com/twitter-bootstrap/4.3.1/js/bootstrap.bundle.js",)
 
-admin.site.site_header='XX后台登录页面'
-admin.site.site_title='XX管理'
+admin.site.site_header='Typeidea'
+admin.site.site_title='Typeidea管理后台'
+admin.site.index_title='首页'

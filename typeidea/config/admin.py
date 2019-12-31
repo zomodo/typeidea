@@ -1,9 +1,10 @@
 from django.contrib import admin
 from .models import Link,SlideBar
+from typeidea.custom_site import custom_site
 
 # Register your models here.
 
-@admin.register(Link)
+@admin.register(Link,site=custom_site)
 class LinkAdmin(admin.ModelAdmin):
     list_display = ('title','href','status','weight','owner','created_time')
     fields = ('title','href','status','weight')
@@ -12,7 +13,7 @@ class LinkAdmin(admin.ModelAdmin):
         obj.owner=request.user
         return super(LinkAdmin,self).save_model(request,obj,form,change)
 
-@admin.register(SlideBar)
+@admin.register(SlideBar,site=custom_site)
 class SlideBarAdmin(admin.ModelAdmin):
     list_display = ('title','display_type','content','status','owner','created_time')
     fields = ('title','display_type','content','status')
