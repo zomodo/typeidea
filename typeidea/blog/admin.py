@@ -26,6 +26,10 @@ class CategoryAdmin(admin.ModelAdmin):
         return obj.post_set.count()
     post_count.short_description = '文章数量'   # 指定表头名称
 
+    def get_queryset(self, request):        # 重写get_queryset函数，当前登陆用户只能看到自己的分类
+        qs=super(CategoryAdmin,self).get_queryset(request)
+        return qs.filter(owner=request.user)
+
 
 @admin.register(Tag,site=custom_site)
 class TagAdmin(admin.ModelAdmin):
