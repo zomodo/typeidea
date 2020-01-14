@@ -4,6 +4,7 @@ from django.urls import reverse
 from django.utils.html import format_html
 from .adminforms import PostAdminForm
 from typeidea.custom_site import custom_site
+from typeidea.base_admin import BaseOwnerAdmin  # 这里导入一个自定义基类：1.自动补充owner字段 2.queryset过滤当前用户数据
 # Register your models here.
 
 class PostInline(admin.TabularInline):      # stackedinline样式不同,设置在其他页直接编辑 修改文章
@@ -12,33 +13,36 @@ class PostInline(admin.TabularInline):      # stackedinline样式不同,设置�
     model = Post
 
 @admin.register(Category,site=custom_site)
-class CategoryAdmin(admin.ModelAdmin):
+class CategoryAdmin(BaseOwnerAdmin):
     inlines = [PostInline,]                 # 在分类页直接编辑/修改文章
 
     list_display = ('name','status','is_nav','owner','created_time','post_count')
     fields = ('name','status','is_nav')
 
-    def save_model(self, request, obj, form, change):       # 重写 save_model函数
-        obj.owner=request.user
-        return super(CategoryAdmin,self).save_model(request,obj,form,change)
+    # def save_model(self, request, obj, form, change):       # 重写 save_model函数
+    #     obj.owner=request.user
+    #     return super(CategoryAdmin,self).save_model(request,obj,form,change)
 
     def post_count(self,obj):           # 自定义函数-计算不同分类有多少文章
         return obj.post_set.count()
     post_count.short_description = '文章数量'   # 指定表头名称
 
-    def get_queryset(self, request):        # 重写get_queryset函数，当前登陆用户只能看到自己的分类
-        qs=super(CategoryAdmin,self).get_queryset(request)
-        return qs.filter(owner=request.user)
+    # def get_queryset(self, request):        # 重写get_queryset函数，当前登陆用户只能看到自己的分类
+    #     qs=super(CategoryAdmin,self).get_queryset(request)
+    #     return qs.filter(owner=request.user)
 
+    # 引入了BaseOwnerAdmin基类，无需再重写save_model和get_queryset函数
 
 @admin.register(Tag,site=custom_site)
-class TagAdmin(admin.ModelAdmin):
+class TagAdmin(BaseOwnerAdmin):
     list_display = ('name','status','owner','created_time')
     fields = ('name','status')
 
-    def save_model(self, request, obj, form, change):
-        obj.owner=request.user
-        return super(TagAdmin,self).save_model(request,obj,form,change)
+    # def save_model(self, request, obj, form, change):
+    #     obj.owner=request.user
+    #     return super(TagAdmin,self).save_model(request,obj,form,change)
+
+    # 引入了BaseOwnerAdmin基类，无需再重写save_model和get_queryset函数
 
 
 class CategoryOwnerFilter(admin.SimpleListFilter):
@@ -56,7 +60,7 @@ class CategoryOwnerFilter(admin.SimpleListFilter):
         return queryset
 
 @admin.register(Post,site=custom_site)
-class PostAdmin(admin.ModelAdmin):
+class PostAdmin(BaseOwnerAdmin):
     form = PostAdminForm        # 引入了自定义的adminforms的PostAdminForm,desc的字段由charfield变成了textarea
 
     list_display = ('title','category','status','owner','created_time','operator')
@@ -99,7 +103,7 @@ class PostAdmin(admin.ModelAdmin):
         }),
         ('其他信息',{
             'fields':('tag',),
-            'classes':('collapse',),
+            'classes':('collapse',),        # collapse标识折叠，或者wide不折叠
         }),
     )
 
@@ -110,13 +114,15 @@ class PostAdmin(admin.ModelAdmin):
         )
     operator.short_description = '操作'       # 指定表头名称
 
-    def save_model(self, request, obj, form, change):   # 重写save_model函数，当前owner默认为当前登录用户
-        obj.owner=request.user
-        return super(PostAdmin,self).save_model(request,obj,form,change)
+    # def save_model(self, request, obj, form, change):   # 重写save_model函数，当前owner默认为当前登录用户
+    #     obj.owner=request.user
+    #     return super(PostAdmin,self).save_model(request,obj,form,change)
+    #
+    # def get_queryset(self, request):            # 重写get_queryset函数，当前登陆用户只能看到自己的文章
+    #     qs=super(PostAdmin,self).get_queryset(request)
+    #     return qs.filter(owner=request.user)
 
-    def get_queryset(self, request):            # 重写get_queryset函数，当前登陆用户只能看到自己的文章
-        qs=super(PostAdmin,self).get_queryset(request)
-        return qs.filter(owner=request.user)
+    # 引入了BaseOwnerAdmin基类，无需再重写save_model和get_queryset函数
 
     # 可以自定义Media类添加js和css资源，改变后台样式
     # class Media:
