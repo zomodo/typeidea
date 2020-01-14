@@ -5,6 +5,7 @@ from django.utils.html import format_html
 from .adminforms import PostAdminForm
 from typeidea.custom_site import custom_site
 from typeidea.base_admin import BaseOwnerAdmin  # 这里导入一个自定义基类：1.自动补充owner字段 2.queryset过滤当前用户数据
+from django.contrib.admin.models import LogEntry    # 导入日志相关的模块
 # Register your models here.
 
 class PostInline(admin.TabularInline):      # stackedinline样式不同,设置在其他页直接编辑 修改文章
@@ -128,6 +129,14 @@ class PostAdmin(BaseOwnerAdmin):
     # class Media:
     #     css={"all":("https://cdn.bootcss.com/twitter-bootstrap/4.3.1/css/bootstrap.min.css",),}
     #     js=("https://cdn.bootcss.com/twitter-bootstrap/4.3.1/js/bootstrap.bundle.js",)
+
+@admin.register(LogEntry,site=custom_site)
+class LogEntryAdmin(admin.ModelAdmin):      # 在admin后台查看操作日志
+    list_display = ['object_repr','object_id','action_flag','user','change_message']
+
+    def get_queryset(self, request):        # 只显示当前登录用户的日志
+        qs=super(LogEntryAdmin, self).get_queryset(request)
+        return qs.filter(user=request.user)
 
 admin.site.site_header='Typeidea'
 admin.site.site_title='Typeidea管理后台'
