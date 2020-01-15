@@ -123,6 +123,28 @@ class PostAdmin(BaseOwnerAdmin):
     #     qs=super(PostAdmin,self).get_queryset(request)
     #     return qs.filter(owner=request.user)
 
+    # admin中外键下拉框添加过滤，在添加文章时只显示当前用户的分类
+    def formfield_for_foreignkey(self, db_field, request, **kwargs):
+        if db_field.name=='category':
+            try:
+                obj_id = request.resolver_match.args[0]  # 这里获取当前对象id，非常重要
+                kwargs['queryset'] = Post.objects.filter(owner=request.user).exclude(id=int(obj_id))  # 添加过滤条件
+            except:
+                kwargs['queryset'] = Post.objects.filter(owner=request.user)
+
+        return super(PostAdmin, self).formfield_for_foreignkey(db_field, request, **kwargs)
+
+    # admin中多对多选择框添加过滤，在添加文章时只显示当前用户的标签
+    def formfield_for_manytomany(self, db_field, request, **kwargs):
+        if db_field.name=='tag':
+            try:
+                obj_id=request.resolver_match.args[0]
+                kwargs['queryset'] = Post.objects.filter(owner=request.user).exclude(id=int(obj_id))
+            except:
+                kwargs['queryset'] = Post.objects.filter(owner=request.user)
+
+        return super(PostAdmin, self).formfield_for_manytomany(db_field,request,**kwargs)
+
     # 引入了BaseOwnerAdmin基类，无需再重写save_model和get_queryset函数
 
     # 可以自定义Media类添加js和css资源，改变后台样式
