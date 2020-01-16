@@ -3,9 +3,11 @@ from django.contrib.auth.models import User
 # Create your models here.
 
 class Category(models.Model):
+    STATUS_NORMAL=1
+    STATUS_DELETE=0
     STATUS_ITEMS=[                  # 可列表，可元祖
-        (1,'正常'),
-        (0,'删除'),
+        (STATUS_NORMAL,'正常'),
+        (STATUS_DELETE,'删除'),
     ]
 
     name=models.CharField(max_length=50,verbose_name='名称')
@@ -20,11 +22,25 @@ class Category(models.Model):
     class Meta:
         verbose_name=verbose_name_plural='分类' # verbose_name_plural表示复数形式的显示
 
+    @classmethod
+    def get_navs(cls):
+        category=cls.objects.filter(status=cls.STATUS_NORMAL)
+        nav_category=[]
+        normal_category=[]
+        for cate in category:
+            if cate.is_nav:
+                nav_category.append(cate)
+            else:
+                normal_category.append(cate)
+        return {'nav_category':nav_category,'normal_category':normal_category}
+
 
 class Tag(models.Model):
+    STATUS_NORMAL=1     # 这样设置方便views中使用
+    STATUS_DELETE=0
     STATUS_ITEMS=[                  # 可列表，可元祖
-        (1,'正常'),
-        (0,'删除'),
+        (STATUS_NORMAL,'正常'),
+        (STATUS_DELETE,'删除'),
     ]
 
     name=models.CharField(max_length=10,verbose_name='名称')
@@ -40,10 +56,13 @@ class Tag(models.Model):
 
 
 class Post(models.Model):
+    STATUS_NORMAL=1      # 这样设置方便views中使用
+    STATUS_DELETE=0
+    STATUS_DRAFT=2
     STATUS_ITEMS=[
-        (1,'正常'),
-        (0,'删除'),
-        (2,'草稿'),
+        (STATUS_NORMAL,'正常'),
+        (STATUS_DELETE,'删除'),
+        (STATUS_DRAFT,'草稿'),
     ]
 
     title=models.CharField(max_length=255,verbose_name='标题')
@@ -61,4 +80,34 @@ class Post(models.Model):
     class Meta:
         verbose_name=verbose_name_plural='文章'
         ordering=['-id']        # 根据id降序
+
+    @staticmethod
+    def get_by_tag(tag_id):
+        try:
+            tag=Tag.objects.get(id=tag_id)
+        except Post.DoesNotExist:
+            tag=None
+            post_list=[]
+        else:
+            post_list=tag.post_set.filter(status=Post.STATUS_NORMAL).select_related('owner','category')
+
+        return tag,post_list
+
+    @staticmethod
+    def get_by_category(category_id):
+        try:
+            category=Category.objects.get(id=category_id)
+        except Category.DoesNotExist:
+            category=None
+            post_list=[]
+        else:
+            post_list=category.post_set.filter(status=Post.STATUS_NORMAL).select_related('owner','category')
+
+        return category,post_list
+
+    @classmethod
+    def latest_post(cls):
+        queryset=cls.objects.filter(status=Post.STATUS_NORMAL)
+        return queryset
+
 

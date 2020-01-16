@@ -1,10 +1,49 @@
 <!DOCTYPE html>
+{% load static %}
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>List</title>
+    <title>typeidea博客系统</title>
 </head>
 <body>
-{{ name }}
+<div>
+    顶部分类：
+    {% for cate in nav_category %}
+        <a href="{% url 'category' cate.id %}">{{ cate.name }}</a>
+    {% endfor %}
+</div>
+<div>
+    {% for sidebar in sidebars %}
+        <h4>{{ sidebar.title }}</h4>
+        {{ sidebar.content }}
+    {% endfor %}
+</div>
+{% if tag %}
+    标签页：{{ tag.name }}
+{% endif %}
+
+{% if category %}
+    分类页：{{ category.name }}
+{% endif %}
+
+<ul>
+    {% for post in post_list %}
+    <li>
+        <a href="{% url 'detail' post.id %}">{{ post.title }}</a>
+        <div>
+            <span>作者：{{ post.owner.username }}</span>
+            <span>分类：{{ post.category.name }}</span>
+        </div>
+        <p>{{ post.desc }}</p>
+    </li>
+    {% endfor %}
+</ul>
+<hr>
+<div>
+    底部分类：
+    {% for cate in normal_category %}
+        <a href="{% url 'category' cate.id %}">{{ cate.name }}</a>
+    {% endfor %}
+</div>
 </body>
 </html>

@@ -31,10 +31,11 @@ class SlideBar(models.Model):
         (3,'最热文章'),
         (4,'最近评论'),
     ]
-
+    STATUS_SHOW=1
+    STATUS_HIDDNE=0
     STATUS_ITEMS=[
-        (1,'展示'),
-        (0,'隐藏'),
+        (STATUS_SHOW,'展示'),
+        (STATUS_HIDDNE,'隐藏'),
     ]
 
     title=models.CharField(max_length=50,verbose_name='标题')
@@ -49,4 +50,8 @@ class SlideBar(models.Model):
 
     class Meta:
         verbose_name=verbose_name_plural='侧边栏'
+
+    @classmethod
+    def get_all(cls):
+        return cls.objects.filter(status=cls.STATUS_SHOW)
 
