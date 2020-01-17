@@ -73,6 +73,8 @@ class Post(models.Model):
     tag=models.ManyToManyField(Tag,verbose_name='标签')
     owner=models.ForeignKey(User,verbose_name='作者')
     created_time=models.DateTimeField(auto_now_add=True,verbose_name='创建时间')
+    pv=models.PositiveIntegerField(default=1)
+    uv=models.PositiveIntegerField(default=1)
 
     def __str__(self):
         return self.title
@@ -107,7 +109,9 @@ class Post(models.Model):
 
     @classmethod
     def latest_post(cls):
-        queryset=cls.objects.filter(status=Post.STATUS_NORMAL)
+        queryset=cls.objects.filter(status=cls.STATUS_NORMAL)
         return queryset
 
-
+    @classmethod
+    def hot_posts(cls):
+        return cls.objects.filter(status=cls.STATUS_NORMAL).only('id','title').order_by('-pv')

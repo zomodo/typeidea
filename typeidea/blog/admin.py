@@ -128,9 +128,9 @@ class PostAdmin(BaseOwnerAdmin):
         if db_field.name=='category':
             try:
                 obj_id = request.resolver_match.args[0]  # 这里获取当前对象id，非常重要
-                kwargs['queryset'] = Post.objects.filter(owner=request.user).exclude(id=int(obj_id))  # 添加过滤条件
+                kwargs['queryset'] = Category.objects.filter(owner=request.user).exclude(id=int(obj_id))  # 添加过滤条件
             except:
-                kwargs['queryset'] = Post.objects.filter(owner=request.user)
+                kwargs['queryset'] = Category.objects.filter(owner=request.user)
 
         return super(PostAdmin, self).formfield_for_foreignkey(db_field, request, **kwargs)
 
@@ -139,9 +139,9 @@ class PostAdmin(BaseOwnerAdmin):
         if db_field.name=='tag':
             try:
                 obj_id=request.resolver_match.args[0]
-                kwargs['queryset'] = Post.objects.filter(owner=request.user).exclude(id=int(obj_id))
+                kwargs['queryset'] = Tag.objects.filter(owner=request.user).exclude(id=int(obj_id))
             except:
-                kwargs['queryset'] = Post.objects.filter(owner=request.user)
+                kwargs['queryset'] = Tag.objects.filter(owner=request.user)
 
         return super(PostAdmin, self).formfield_for_manytomany(db_field,request,**kwargs)
 

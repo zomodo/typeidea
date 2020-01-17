@@ -4,9 +4,11 @@ from blog.models import Post
 # Create your models here.
 
 class Comment(models.Model):
+    STATUS_NORMAL=1
+    STATUS_DELETE=0
     STATUS_ITEMS=[
-        (1,'正常'),
-        (0,'删除'),
+        (STATUS_NORMAL,'正常'),
+        (STATUS_DELETE,'删除'),
     ]
 
     target=models.ForeignKey(Post,verbose_name='评论目标')
