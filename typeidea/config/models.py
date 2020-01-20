@@ -62,7 +62,7 @@ class SlideBar(models.Model):
     def get_all(cls):
         return cls.objects.filter(status=cls.STATUS_SHOW)
 
-    @property
+    @property           # @property修饰方法，使方法可以像属性一样访问
     def content_html(self):
         """直接渲染模板"""
         from blog.models import Post
