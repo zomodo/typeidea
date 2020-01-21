@@ -1,24 +1,18 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Detail</title>
-</head>
-<body>
-<div>
-    {% for sidebar in sidebars %}
-        <h4>{{ sidebar.title }}</h4>
-        {{ sidebar.content_html }}
-    {% endfor %}
-</div>
-{% if post_detail %}
+{% extends 'blog/base.html' %}
+
+{% block title %}
+    {{ post_detail.title }}
+{% endblock %}
+
+{% block main %}
+    {% if post_detail %}
     <h1>{{ post_detail.title }}</h1>
     <div>
-    <span>分类：{{ post_detail.category.name }}</span>
-    <span>作者：{{ post_detail.owner.username }}</span>
+        <span>分类：{{ post_detail.category.name }}</span>
+        <span>作者：{{ post_detail.owner.username }}</span>
     </div>
-    <hr>
+    <hr/>
     <p>{{ post_detail.content }}</p>
-{% endif %}
-</body>
-</html>
+    {% endif %}
+{% endblock %}
+
