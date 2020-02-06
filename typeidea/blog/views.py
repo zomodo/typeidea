@@ -31,6 +31,8 @@ def post_list(request,category_id=None,tag_id=None):
     return render(request,'blog/list.html',context=context)
 """
 
+""" 利用function view改造 """
+"""
 def post_list(request,tag_id=None,category_id=None):
     tag=None
     category=None
@@ -57,5 +59,60 @@ def post_detail(request,post_id=None):
     context.update(models.Category.get_navs())
     context.update({'sidebars':SlideBar.get_all()})
     return render(request,'blog/detail.html',context=context)
+"""
+
+""" 利用class-based view改造 """
+from django.views.generic import ListView,DetailView
+from django.shortcuts import get_object_or_404
+from config.models import SlideBar
+
+class CommonViewMixin:      # 顶部导航、底部导航、侧边栏通用数据
+    # get_context_data接口：获取渲染到模板中的所有上下文，如果有新增数据需要传递到模板中，可以重写该方法来完成
+    def get_context_data(self,**kwargs):
+        context=super(CommonViewMixin, self).get_context_data(**kwargs)
+        context.update({'sidebars':SlideBar.get_all()})
+        context.update(models.Category.get_navs())
+        return context
+
+class IndexView(CommonViewMixin,ListView):      # 首页数据
+    queryset = models.Post.latest_post()
+    paginate_by = 5     # 分页
+    context_object_name = 'post_list'       # 设置模板中的变量
+    template_name = 'blog/list.html'
+
+class CategoryView(IndexView):      # 分类数据，继承IndexView
+    def get_context_data(self, **kwargs):
+        context=super(CategoryView, self).get_context_data(**kwargs)
+        category_id=self.kwargs.get('category_id')  # self.kwargs中的数据是从URL定义中拿到的
+        category=get_object_or_404(models.Category,pk=category_id)
+        context.update({'category':category})
+        return context
+
+    def get_queryset(self):
+        """ 重写queryset，根据分类过滤 """
+        queryset=super(CategoryView, self).get_queryset()
+        category_id=self.kwargs.get('category_id')
+        return queryset.filter(category__id=category_id)
+
+class TagView(IndexView):        # 标签数据，继承IndexView
+    def get_context_data(self, **kwargs):
+        context=super(TagView, self).get_context_data(**kwargs)
+        tag_id=self.kwargs.get('tag_id')
+        tag=get_object_or_404(models.Tag,pk=tag_id)
+        context.update({'tag':tag})
+        return context
+
+    def get_queryset(self):
+        """ 重写queryset，根据标签过滤 """
+        queryset=super(TagView, self).get_queryset()
+        tag_id=self.kwargs.get('tag_id')
+        return queryset.filter(tag__id=tag_id)
+
+class PostDetailView(CommonViewMixin,DetailView):   # 文章详情页数据
+    queryset = models.Post.latest_post()
+    template_name = 'blog/detail.html'
+    context_object_name = 'post_detail'
+    pk_url_kwarg = 'post_id'
+
 
 
