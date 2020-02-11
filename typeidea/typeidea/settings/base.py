@@ -56,10 +56,12 @@ MIDDLEWARE = [
 
 ROOT_URLCONF = 'typeidea.urls'
 
+# 修改了templates的路径，如果修改样式可以直接新加一个目录，然后修改THEME路径
+THEME='default'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [os.path.join(BASE_DIR,'themes',THEME,'templates')],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
