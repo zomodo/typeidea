@@ -39,4 +39,6 @@ urlpatterns = [
     url(r'^tag/(?P<tag_id>(\d+))/$',blog_view.TagView.as_view(),name='tag'),
     url(r'^post/(?P<post_id>(\d+)).html$',blog_view.PostDetailView.as_view(),name='detail'),
     url(r'^links/$',config_view.links,name='links'),
+    url(r'^search/$',blog_view.SearchView.as_view(),name='search'),
+    url(r'^author/(?P<author_id>(\d+))/$',blog_view.AuthorView.as_view(),name='author'),
 ]

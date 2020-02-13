@@ -1,5 +1,6 @@
 from django.shortcuts import render
 from django.shortcuts import HttpResponse
+from django.db.models import Q   #django提供的条件表达式，用来处理复杂查询
 from . import models
 from config.models import Link,SlideBar
 # Create your views here.
@@ -114,5 +115,25 @@ class PostDetailView(CommonViewMixin,DetailView):   # 文章详情页数据
     context_object_name = 'post_detail'
     pk_url_kwarg = 'post_id'
 
+class SearchView(IndexView):        # 搜索数据，继承IndexView
+    def get_context_data(self,**kwargs):
+        context=super(SearchView, self).get_context_data(**kwargs)
+        keyword=self.request.GET.get('keyword','') # 获取前端name='keyword'的输入，如果没有数据则为空
+        context.update({'keyword':keyword})
+        return context
 
+    def get_queryset(self):
+        queryset=super(SearchView, self).get_queryset()
+        keyword=self.request.GET.get('keyword','')
+        if not keyword:
+            return queryset
+        else:
+            return queryset.filter(Q(title__icontains=keyword) | Q(desc__icontains=keyword))
+            #icontains表示包含，并忽略大小写；| 表示“或”条件
+
+class AuthorView(IndexView):        # 作者过滤，继承IndexView
+    def get_queryset(self):
+        queryset=super(AuthorView, self).get_queryset()
+        author_id=self.kwargs.get('author_id')
+        return queryset.filter(owner__id=author_id)
 
