@@ -6,9 +6,11 @@ from django.template.loader import render_to_string
 # Create your models here.
 
 class Link(models.Model):
+    STATUS_NORMAL=1
+    STATUS_DELETE=0
     STATUS_ITEMS=[
-        (1,'正常'),
-        (0,'删除'),
+        (STATUS_NORMAL,'正常'),
+        (STATUS_DELETE,'删除'),
     ]
 
     title=models.CharField(max_length=50,verbose_name='标题')
@@ -24,6 +26,7 @@ class Link(models.Model):
 
     class Meta:
         verbose_name=verbose_name_plural='友链'
+        ordering=['-weight']    # 根据权重降序
 
 
 class SlideBar(models.Model):
