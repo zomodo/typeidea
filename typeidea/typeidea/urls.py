@@ -41,4 +41,5 @@ urlpatterns = [
     url(r'^links/$',config_view.LinkListView.as_view(),name='links'),
     url(r'^search/$',blog_view.SearchView.as_view(),name='search'),
     url(r'^author/(?P<author_id>(\d+))/$',blog_view.AuthorView.as_view(),name='author'),
+    url(r'^comment/$',comment_view.CommentView.as_view(),name='comment'),
 ]

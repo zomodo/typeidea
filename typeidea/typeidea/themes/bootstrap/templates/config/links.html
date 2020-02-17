@@ -1,5 +1,5 @@
 {% extends 'blog/base.html' %}
-
+{% load comment_block %}    <!-- 加载自定义的评论模块组件，放在顶部且在extends下面 -->
 {% block title %}
     友情链接
 {% endblock %}
@@ -23,4 +23,7 @@
             {% endfor %}
         </tbody>
     </table>
+
+    {% comment_block request.path %}    <!-- 在需要展示评论的地方加上自定义组件 -->
+
 {% endblock %}

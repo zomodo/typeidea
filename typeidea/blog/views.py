@@ -3,6 +3,7 @@ from django.shortcuts import HttpResponse
 from django.db.models import Q   #django提供的条件表达式，用来处理复杂查询
 from . import models
 from config.models import Link,SlideBar
+from comment.models import Comment
 # Create your views here.
 
 """
@@ -66,6 +67,7 @@ def post_detail(request,post_id=None):
 from django.views.generic import ListView,DetailView
 from django.shortcuts import get_object_or_404
 from config.models import SlideBar
+from comment.forms import CommentForm   # 导入评论中的Form输入框渲染到前端
 
 class CommonViewMixin:      # 顶部导航、底部导航、侧边栏通用数据
     # get_context_data接口：获取渲染到模板中的所有上下文，如果有新增数据需要传递到模板中，可以重写该方法来完成
@@ -114,6 +116,17 @@ class PostDetailView(CommonViewMixin,DetailView):   # 文章详情页数据
     template_name = 'blog/detail.html'
     context_object_name = 'post_detail'
     pk_url_kwarg = 'post_id'
+
+    """
+    # 抽象出了评论模块和组件——comment下面的templatetags文件，所以这里要注释掉，
+    def get_context_data(self,**kwargs):        # 新增评论数据，并传递到文章明细的模板中
+        context=super(PostDetailView, self).get_context_data(**kwargs)
+        context.update({
+            "comment_form":CommentForm,
+            "comment_list":Comment.get_by_target(self.request.path),
+        })
+        return context
+    """
 
 class SearchView(IndexView):        # 搜索数据，继承IndexView
     def get_context_data(self,**kwargs):
