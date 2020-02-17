@@ -16,7 +16,10 @@
                     <span>{{ comment.created_time }}</span>
                 </div>
                 <div class="comment-content">
+                <!-- 将content配置Markdown之后，HTML代码会直接显示到页面，这时需要关闭自动转码功能 -->
+                    {% autoescape off %}
                     {{ comment.content }}
+                    {% endautoescape %}
                 </div>
             </li>
         {% endfor %}

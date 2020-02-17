@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
+import mistune  # 配置Markdown
 # Create your models here.
 
 class Category(models.Model):
@@ -75,6 +76,8 @@ class Post(models.Model):
     created_time=models.DateTimeField(auto_now_add=True,verbose_name='创建时间')
     pv=models.PositiveIntegerField(default=1)
     uv=models.PositiveIntegerField(default=1)
+    content_html=models.TextField(verbose_name='正文html代码',blank=True,editable=False)
+    # 文章正文使用Markdown，content_html是用来存储Markdown之后的内容,同时要重写save函数（见下方），editable=False表示不可编辑
 
     def __str__(self):
         return self.title
@@ -115,3 +118,7 @@ class Post(models.Model):
     @classmethod
     def hot_posts(cls):
         return cls.objects.filter(status=cls.STATUS_NORMAL).only('id','title').order_by('-pv')
+
+    def save(self,*args,**kwargs):  # content_html是用来存储content Markdown之后的内容
+        self.content_html=mistune.markdown(self.content)
+        return super(Post, self).save(*args,**kwargs)

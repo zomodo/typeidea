@@ -25,7 +25,12 @@
         </span>
     </div>
     <hr/>
-    <p>{{ post_detail.content }}</p>
+    <p>
+        <!-- content_html是Markdown之后的字段，HTML代码会直接显示到页面，这时需要关闭自动转码功能 -->
+        {% autoescape off %}
+        {{ post_detail.content_html }}
+        {% endautoescape %}
+    </p>
     {% endif %}
 
     {% comment_block request.path %}     <!-- 在需要展示评论的地方加上自定义组件 -->

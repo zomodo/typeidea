@@ -10,7 +10,13 @@
         <li>
         <a href="{{ comment.target }}">{{ comment.target }}</a>
             <br>
-        <span>{{ comment.nickname }}：{{ comment.content }}</span>
+        <span>
+            {{ comment.nickname }}：
+        <!-- 将content配置Markdown之后，HTML代码会直接显示到页面，这时需要关闭自动转码功能 -->
+            {% autoescape off %}
+            {{ comment.content }}
+            {% endautoescape %}
+        </span>
         </li>
     {% endfor %}
 </ul>

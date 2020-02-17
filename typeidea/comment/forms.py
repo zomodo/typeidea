@@ -1,4 +1,5 @@
 from django import forms
+import mistune
 from . import models
 
 class CommentForm(forms.ModelForm):
@@ -36,6 +37,8 @@ class CommentForm(forms.ModelForm):
         content=self.cleaned_data['content']  # 或者这样写self.cleaned_data.get('content')
         if len(content)<10:
             raise forms.ValidationError('内容长度怎么能这么短呢！')
+        content=mistune.markdown(content)
+        # 配置Markdown，配置之后HTML代码将直接展示在页面上，这时需要在前端content上下增加{% autoescape off %}{{  }}{% endautoescape %}
         return content
 
     class Meta:
