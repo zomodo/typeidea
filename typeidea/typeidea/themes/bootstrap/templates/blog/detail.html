@@ -1,7 +1,17 @@
 {% extends 'blog/base.html' %}
 {% load comment_block %}        <!-- 加载自定义的评论模块组件，放在顶部且在extends下面 -->
+{% load staticfiles %}
 {% block title %}
     {{ post_detail.title }}
+{% endblock %}
+
+<!-- 添加代码高亮的部分，放在head中 -->
+{% block extra_head %}
+    <link rel="stylesheet" href="https://cdn.bootcss.com/highlight.js/9.12.0/styles/googlecode.min.css">
+    <script src="https://cdn.bootcss.com/highlight.js/9.12.0/highlight.min.js"></script>
+    <script>
+        hljs.initHighlightingOnLoad();
+    </script>
 {% endblock %}
 
 {% block main %}
