@@ -1,6 +1,8 @@
 from django.shortcuts import render
 from django.shortcuts import HttpResponse
-from django.db.models import Q   #django提供的条件表达式，用来处理复杂查询
+from django.db.models import Q,F   #django提供的条件表达式，用来处理复杂查询
+from datetime import date
+from django.core.cache import cache     # 缓存
 from . import models
 from config.models import Link,SlideBar
 from comment.models import Comment
@@ -127,6 +129,34 @@ class PostDetailView(CommonViewMixin,DetailView):   # 文章详情页数据
         })
         return context
     """
+    # PostDetailView中新增一个方法handle_visited专门处理PV和UV统计
+    def get(self, request, *args, **kwargs):
+        response=super(PostDetailView, self).get(request,*args,**kwargs)
+        self.handle_visited()
+        return response
+
+    def handle_visited(self):
+        increase_pv=False
+        increase_uv=False
+        uid=self.request.uid
+        pv_key='pv:%s:%s' %(uid,self.request.path)
+        uv_key='uv:%s:%s:%s' %(uid,str(date.today()),self.request.path)
+
+        if not cache.get(pv_key):
+            increase_pv=True
+            cache.set(pv_key, 1, 1*60)    # 1分钟有效
+
+        if not cache.get(uv_key):
+            increase_uv=True
+            cache.set(pv_key, 1, 24*60*60)    # 24小时有效
+
+        if increase_pv and increase_uv:
+            models.Post.objects.filter(pk=self.object.id).update(pv=F('pv')+1,uv=F('uv')+1)
+        elif increase_pv:
+            models.Post.objects.filter(pk=self.object.id).update(pv=F('pv')+1)
+        elif increase_uv:
+            models.Post.objects.filter(pk=self.object.id).update(uv=F('uv')+1)
+
 
 class SearchView(IndexView):        # 搜索数据，继承IndexView
     def get_context_data(self,**kwargs):
