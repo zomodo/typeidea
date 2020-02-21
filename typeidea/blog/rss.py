@@ -1,3 +1,7 @@
+"""
+新建rss文件，利用RSS（简易信息聚合）提供订阅接口，网站有更新时，RSS阅读器会自动获取最新内容，
+用户可以在RSS阅读器中看到最新内容，避免每次需要打开网站才能看到是否有更新。
+"""
 from django.contrib.syndication.views import Feed
 from django.urls import reverse
 from django.utils.feedgenerator import Rss201rev2Feed
