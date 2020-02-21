@@ -18,7 +18,7 @@ class LatestPostFeed(Feed):
     link = "/rss/"
     description_template = "typeidea is a blog system power by django"
 
-    def item(self):
+    def items(self):
         return Post.objects.filter(status=Post.STATUS_NORMAL)[:5]
 
     def item_title(self, item):

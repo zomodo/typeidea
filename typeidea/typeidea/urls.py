@@ -19,6 +19,11 @@ from typeidea.custom_site import custom_site
 from blog import views as blog_view
 from comment import views as comment_view
 from config import views as config_view
+
+from django.contrib.sitemaps import views as sitemap_views
+from blog.rss import LatestPostFeed     # 订阅接口
+from blog.sitemap import PostSitemap       # 站点地图
+
 """
 urlpatterns = [
     url(r'^super_admin/',admin.site.urls),
@@ -42,4 +47,6 @@ urlpatterns = [
     url(r'^search/$',blog_view.SearchView.as_view(),name='search'),
     url(r'^author/(?P<author_id>(\d+))/$',blog_view.AuthorView.as_view(),name='author'),
     url(r'^comment/$',comment_view.CommentView.as_view(),name='comment'),
+    url(r'^rss|feed/',LatestPostFeed(),name='rss'),
+    url(r'^sitemap\.xml$',sitemap_views.sitemap,{'sitemaps':{'posts':PostSitemap}}),
 ]

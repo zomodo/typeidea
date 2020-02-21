@@ -1,6 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import User
 import mistune  # 配置Markdown
+from django.utils.functional import cached_property
 # Create your models here.
 
 class Category(models.Model):
@@ -122,3 +123,12 @@ class Post(models.Model):
     def save(self,*args,**kwargs):  # content_html是用来存储content Markdown之后的内容
         self.content_html=mistune.markdown(self.content)
         return super(Post, self).save(*args,**kwargs)
+
+    @cached_property
+    def tags(self):         # 用作sitemap.xml中的调用
+        return ','.join(self.tag.values_list('name',flat=True))
+    """
+    values_list迭代时返回的是元祖，如果只有一个参数，使用flat=True则表示返回的结果为单个值而不是元祖;
+    这里用到django提供的一个工具cached_property，作用是帮我们把返回的数据绑定到实例上，不用每次访问时
+    都去执行tags函数中的代码，可对比python内置的property。
+    """
