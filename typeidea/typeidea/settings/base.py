@@ -36,6 +36,9 @@ INSTALLED_APPS = [
     'config',
     'comment',
 
+    'xadmin',           # xadmin主体模块
+    'crispy_forms',     # 渲染表格模块
+
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
