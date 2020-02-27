@@ -15,14 +15,17 @@ Including another URLconf
 """
 from django.conf.urls import url
 from django.contrib import admin
+from django.contrib.sitemaps import views as sitemap_views
+import xadmin
+
 from typeidea.custom_site import custom_site
 from blog import views as blog_view
 from comment import views as comment_view
 from config import views as config_view
-
-from django.contrib.sitemaps import views as sitemap_views
 from blog.rss import LatestPostFeed     # 订阅接口
 from blog.sitemap import PostSitemap       # 站点地图
+
+
 
 """
 urlpatterns = [
@@ -37,8 +40,9 @@ urlpatterns = [
 """
 # 利用class-based view改造之后的URL
 urlpatterns = [
-    url(r'^super_admin/',admin.site.urls),
-    url(r'^admin/', custom_site.urls),
+    # url(r'^super_admin/',admin.site.urls),  # xadmin不支持多个site配置
+    # url(r'^admin/', custom_site.urls),      # xadmin不支持多个site配置
+    url(r'^admin/',xadmin.site.urls,name='xadmin'),
     url(r'^$',blog_view.IndexView.as_view(),name='index'),
     url(r'^category/(?P<category_id>(\d+))/$',blog_view.CategoryView.as_view(),name='category'),
     url(r'^tag/(?P<tag_id>(\d+))/$',blog_view.TagView.as_view(),name='tag'),

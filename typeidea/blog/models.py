@@ -72,7 +72,7 @@ class Post(models.Model):
     content=models.TextField(verbose_name='正文',help_text='正文必须为MarkDown格式')
     status=models.PositiveIntegerField(choices=STATUS_ITEMS,default=1,verbose_name='状态')
     category=models.ForeignKey(Category,verbose_name='分类')
-    tag=models.ManyToManyField(Tag,verbose_name='标签')
+    tag=models.ManyToManyField(Tag,verbose_name='标签',blank=True,null=True)
     owner=models.ForeignKey(User,verbose_name='作者')
     created_time=models.DateTimeField(auto_now_add=True,verbose_name='创建时间')
     pv=models.PositiveIntegerField(default=1)

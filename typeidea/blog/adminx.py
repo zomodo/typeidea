@@ -1,19 +1,39 @@
 from django.contrib import admin
-from .models import Post,Tag,Category
 from django.urls import reverse
 from django.utils.html import format_html
+from django.contrib.admin.models import LogEntry    # 导入日志相关的模块
+import xadmin
+from xadmin.layout import Row,Fieldset,Container    # 引入xadmin后导入
+from xadmin.filters import manager                  # 引入xadmin的自定义过滤器
+from xadmin.filters import RelatedFieldListFilter   # 引入xadmin的自定义过滤器
+
+from .models import Post,Tag,Category
 from .adminforms import PostAdminForm
 from typeidea.custom_site import custom_site
 from typeidea.base_admin import BaseOwnerAdmin  # 这里导入一个自定义基类：1.自动补充owner字段 2.queryset过滤当前用户数据
-from django.contrib.admin.models import LogEntry    # 导入日志相关的模块
+
 # Register your models here.
 
+"""
+# 继承admin的类
 class PostInline(admin.TabularInline):      # stackedinline样式不同,设置在其他页直接编辑 修改文章
     fields = ('title','desc')
     extra = 1   # 控制额外多几个
     model = Post
+"""
 
-@admin.register(Category,site=custom_site)
+# 使用xadmin的方式
+class PostInline:
+    form_layout=(
+        Container(
+            Row('title','desc'),
+        )
+    )
+    extra = 1   # 控制额外多几个
+    model = Post
+
+# @admin.register(Category,site=custom_site)    # admin
+@xadmin.sites.register(Category)    # xadmin
 class CategoryAdmin(BaseOwnerAdmin):
     inlines = [PostInline,]                 # 在分类页直接编辑/修改文章
 
@@ -34,7 +54,8 @@ class CategoryAdmin(BaseOwnerAdmin):
 
     # 引入了BaseOwnerAdmin基类，无需再重写save_model和get_queryset函数
 
-@admin.register(Tag,site=custom_site)
+# @admin.register(Tag,site=custom_site)    # admin
+@xadmin.sites.register(Tag)     # xadmin
 class TagAdmin(BaseOwnerAdmin):
     list_display = ('name','status','owner','created_time')
     fields = ('name','status')
@@ -45,9 +66,10 @@ class TagAdmin(BaseOwnerAdmin):
 
     # 引入了BaseOwnerAdmin基类，无需再重写save_model和get_queryset函数
 
-
+"""
+# admin的自定义过滤器
 class CategoryOwnerFilter(admin.SimpleListFilter):
-    """自定义过滤器只展示当前用户分类"""
+    # 自定义过滤器只展示当前用户分类
     title = '分类过滤器'
     parameter_name = 'owner_category'
 
@@ -59,14 +81,33 @@ class CategoryOwnerFilter(admin.SimpleListFilter):
         if category_id:
             return queryset.filter(category_id=self.value())
         return queryset
+"""
+# xadmin的自定义过滤器
+class CategoryOwnerFilter(RelatedFieldListFilter):
+    @classmethod
+    def test(cls, field, request, params, model, admin_view, field_path):
+        return field.name=='category'
 
-@admin.register(Post,site=custom_site)
+    def __init__(self, field, request, params, model, model_admin, field_path):
+        super(CategoryOwnerFilter, self).__init__(field,request,params,model,model_admin,field_path)
+        # 重新获取lookup_choices，根据owner过滤
+        self.lookup_choices=Category.objects.filter(owner=request.user).values_list('id','name')
+manager.register(CategoryOwnerFilter,take_priority=True)
+"""
+test方法的作用是确认字段是否需要被当前的过滤器处理，在方法__init__中，
+我们执行完父类__init__之后,又重新定义了self.lookup_choices，这个值在默认情况下查询所有的数据
+"""
+
+# @admin.register(Post,site=custom_site)    # admin
+@xadmin.sites.register(Post)
 class PostAdmin(BaseOwnerAdmin):
-    form = PostAdminForm        # 引入了自定义的adminforms的PostAdminForm,desc的字段由charfield变成了textarea
+    # 引入了自定义的adminforms的PostAdminForm,desc的字段由charfield变成了textarea，这里必须为form
+    form = PostAdminForm
 
     list_display = ('title','category','status','owner','created_time','operator')
     list_display_links = ()
-    list_filter = (CategoryOwnerFilter,)
+    # list_filter = (CategoryOwnerFilter,)  # admin的自定义过滤器，这里是定义的类名
+    list_filter = ('category',)     # xadmin的自定义过滤器，注意这里不是定义的filter类，而是字段名
     search_fields = ('title','category__name')
     actions_on_top = True
     actions_on_bottom = True
@@ -76,7 +117,7 @@ class PostAdmin(BaseOwnerAdmin):
     filter_horizontal = ('tag',)
     # filter_vertical = ('tag',)
 
-    # exclude = ('owner',)        # exclude指定哪些字段不展示
+    exclude = ('owner','pv','uv')        # exclude指定哪些字段不展示
     # fields限定要展示的字段，配置展示字段顺序
     # fields = (
     #     ('category','title'),
@@ -88,6 +129,7 @@ class PostAdmin(BaseOwnerAdmin):
 
     # fieldsets 控制页面布局
     """ fieldsets中是元祖，元祖中第一个元素是string，第二个元素是dict，而dict的key可以是'fields','description','classes'  """
+    """
     fieldsets = (
         ('基础配置',{
             'description':'基础配置描述',
@@ -107,11 +149,31 @@ class PostAdmin(BaseOwnerAdmin):
             'classes':('collapse',),        # collapse标识折叠，或者wide不折叠
         }),
     )
+    """
+    # xadmin中manytomany字段样式是单排下拉框，需要设置m2m_transfer
+    style_fields={'tag':'m2m_transfer'}
+
+    # 修改为xadmin的方式
+    form_layout=(
+        Fieldset(
+            "基础信息",
+            Row("title","category"),
+            "status",
+            "tag",
+        ),
+        Fieldset(
+            "内容信息",
+            "desc",
+            "content",
+        ),
+    )
 
     def operator(self,obj):         # 自定义函数-list_display处增加一列“编辑”
         return format_html(
             "<a href='{}'>编辑</a>",
-            reverse("cus_admin:blog_post_change",args=(obj.id,))
+            # reverse("cus_admin:blog_post_change",args=(obj.id,))    # admin
+            # reverse("xadmin:blog_post_change",args=(obj.id,))       # xadmin
+            self.model_admin_url('change',obj.id)       # xadmin中更友好的方法
         )
     operator.short_description = '操作'       # 指定表头名称
 
@@ -124,6 +186,7 @@ class PostAdmin(BaseOwnerAdmin):
     #     return qs.filter(owner=request.user)
 
     # admin中外键下拉框添加过滤，在添加文章时只显示当前用户的分类
+    """
     def formfield_for_foreignkey(self, db_field, request, **kwargs):
         if db_field.name=='category':
             try:
@@ -133,8 +196,10 @@ class PostAdmin(BaseOwnerAdmin):
                 kwargs['queryset'] = Category.objects.filter(owner=request.user)
 
         return super(PostAdmin, self).formfield_for_foreignkey(db_field, request, **kwargs)
+    """
 
     # admin中多对多选择框添加过滤，在添加文章时只显示当前用户的标签
+    """
     def formfield_for_manytomany(self, db_field, request, **kwargs):
         if db_field.name=='tag':
             try:
@@ -144,6 +209,16 @@ class PostAdmin(BaseOwnerAdmin):
                 kwargs['queryset'] = Tag.objects.filter(owner=request.user)
 
         return super(PostAdmin, self).formfield_for_manytomany(db_field,request,**kwargs)
+    """
+    # xadmin中category外键下拉框添加过滤，tag多对多选择框添加过滤
+    def formfield_for_dbfield(self, db_field, **kwargs):
+        if not self.request.user.is_superuser:
+            if db_field.name == "category":
+                kwargs["queryset"] = Category.objects.filter(owner=self.request.user)
+            if db_field.name == "tag":
+                kwargs["queryset"] = Tag.objects.filter(owner=self.request.user)
+
+        return super().formfield_for_dbfield(db_field,**kwargs)
 
     # 引入了BaseOwnerAdmin基类，无需再重写save_model和get_queryset函数
 
@@ -152,14 +227,30 @@ class PostAdmin(BaseOwnerAdmin):
     #     css={"all":("https://cdn.bootcss.com/twitter-bootstrap/4.3.1/css/bootstrap.min.css",),}
     #     js=("https://cdn.bootcss.com/twitter-bootstrap/4.3.1/js/bootstrap.bundle.js",)
 
+    # @property
+    # def media(self):
+    #     # xadmin基于bootstrap，引入会导致页面样式冲突，这里只做演示
+    #     media=super().media
+    #     media.add_js(['https://cdn.bootcss.com/bootstrap/4.0.0-beta.2/js/bootstrap.bundle.js'])
+    #     media.add_css({
+    #         'all':('https://cdn.bootcss.com/bootstrap/4.0.0-beta.2/css/bootstrap.min.css',),
+    #     })
+    #     return media
+
+"""
+# 这里是admin自带的log功能，因为xadmin也自带了log功能，并且默认配置好了展示逻辑，所以这里注释掉
 @admin.register(LogEntry,site=custom_site)
 class LogEntryAdmin(admin.ModelAdmin):      # 在admin后台查看操作日志
+
     list_display = ['object_repr','object_id','action_flag','user','change_message']
 
-    def get_queryset(self, request):        # 只显示当前登录用户的日志
+    def get_queryset(self, request):        # 只显示当前登录用户的日志,admin方式
         qs=super(LogEntryAdmin, self).get_queryset(request)
-        return qs.filter(user=request.user)
+        return qs.filter(owner=request.user)
+"""
 
-admin.site.site_header='Typeidea'
-admin.site.site_title='Typeidea管理后台'
-admin.site.index_title='首页'
+
+# admin的方式
+# admin.site.site_header='Typeidea'
+# admin.site.site_title='Typeidea管理后台'
+# admin.site.index_title='首页'

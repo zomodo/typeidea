@@ -158,3 +158,7 @@ STATIC_ROOT = '/tmp/static'
 STATICFILES_DIRS = [
     os.path.join(BASE_DIR,'themes',THEME,'static'),
 ]
+
+# 导入xadmin之后，可以在这里修改系统名称和footer内容
+XADMIN_TITLE='Typeidea管理后台'
+XADMIN_FOOTER_TITLE='power by zomodo'
