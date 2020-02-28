@@ -24,7 +24,7 @@ from comment import views as comment_view
 from config import views as config_view
 from blog.rss import LatestPostFeed     # 订阅接口
 from blog.sitemap import PostSitemap       # 站点地图
-
+from typeidea.autocomplete import CategoryAutocomplete,TagAutocomplete
 
 
 """
@@ -53,4 +53,7 @@ urlpatterns = [
     url(r'^comment/$',comment_view.CommentView.as_view(),name='comment'),
     url(r'^rss|feed/',LatestPostFeed(),name='rss'),
     url(r'^sitemap\.xml$',sitemap_views.sitemap,{'sitemaps':{'posts':PostSitemap}}),
+    # category和tag的autocomplete配置url
+    url(r'^category_autocomplete/$',CategoryAutocomplete.as_view(),name='category_autocomplete'),
+    url(r'^tag_autocomplete/$',TagAutocomplete.as_view(),name='tag_autocomplete'),
 ]

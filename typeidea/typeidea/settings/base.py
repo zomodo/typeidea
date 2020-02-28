@@ -39,6 +39,9 @@ INSTALLED_APPS = [
     'xadmin',           # xadmin主体模块
     'crispy_forms',     # 渲染表格模块
 
+    'dal',              # django-autocomplete-light模块
+    'dal_select2',
+
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',

@@ -211,14 +211,15 @@ class PostAdmin(BaseOwnerAdmin):
         return super(PostAdmin, self).formfield_for_manytomany(db_field,request,**kwargs)
     """
     # xadmin中category外键下拉框添加过滤，tag多对多选择框添加过滤
-    def formfield_for_dbfield(self, db_field, **kwargs):
-        if not self.request.user.is_superuser:
-            if db_field.name == "category":
-                kwargs["queryset"] = Category.objects.filter(owner=self.request.user)
-            if db_field.name == "tag":
-                kwargs["queryset"] = Tag.objects.filter(owner=self.request.user)
-
-        return super().formfield_for_dbfield(db_field,**kwargs)
+    # 引入了autocomplete之后，category和tag做了过滤，所以这里去掉，见autocomplete.py
+    # def formfield_for_dbfield(self, db_field, **kwargs):
+    #     if not self.request.user.is_superuser:
+    #         if db_field.name == "category":
+    #             kwargs["queryset"] = Category.objects.filter(owner=self.request.user)
+    #         if db_field.name == "tag":
+    #             kwargs["queryset"] = Tag.objects.filter(owner=self.request.user)
+    #
+    #     return super().formfield_for_dbfield(db_field,**kwargs)
 
     # 引入了BaseOwnerAdmin基类，无需再重写save_model和get_queryset函数
 
