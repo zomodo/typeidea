@@ -27,20 +27,68 @@ class PostAdminForm(forms.ModelForm):
     """
     # content添加富文本编辑器，不能添加图片
     content=forms.CharField(
-        widget=CKEditorWidget,
+        widget=CKEditorWidget(),
         label='正文',
         required=True,
     )
     """
 
     # content添加富文本编辑器，可以添加图片
-    content=forms.CharField(
-        widget=CKEditorUploadingWidget,
-        label='正文',
-        required=True,
-    )
+    # 修改content使Markdown和CKeditor共存，所以注释掉
+    # content=forms.CharField(
+    #     widget=CKEditorUploadingWidget(),
+    #     label='正文',
+    #     required=True,
+    # )
 
+    # 以下全部是配置Markdown和CKeditor共存的内容，建议直接使用一种方法CKeditor，即上方配置
+
+    content_ck=forms.CharField(
+        widget=CKEditorUploadingWidget(),
+        label='正文',
+        required=False,
+    )
+    content_md=forms.CharField(
+        widget=forms.Textarea(),
+        label='正文',
+        required=False,
+    )
+    content=forms.CharField(
+        widget=forms.HiddenInput(),
+        required=False,
+    )
 
     class Meta:
         model=Post
-        fields=['category','tag','title','desc','content','status']
+        fields=(
+            'category','tag','title','desc','status',
+            'is_md','content','content_ck','content_md'
+        )
+
+    # 使Markdown和CKeditor共存
+    def __init__(self,instance=None,initial=None,**kwargs):
+        initial=initial or {}
+        if instance:
+            if instance.is_md:
+                initial['content_md']=instance.content
+            else:
+                initial['content_ck']=instance.content
+        super(PostAdminForm, self).__init__(instance=instance,initial=initial,**kwargs)
+
+    def clean(self):
+        is_md=self.cleaned_data['is_md']
+        if is_md:
+            content_field_name='content_md'
+        else:
+            content_field_name='content_ck'
+
+        content=self.cleaned_data[content_field_name]
+        if not content:
+            self.add_error(content_field_name,'必填项！')
+            return
+        self.cleaned_data['content']=content
+        return super(PostAdminForm, self).clean()
+
+    class Media:
+        js=('js/post_editor.js',)
+

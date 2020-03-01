@@ -79,6 +79,8 @@ class Post(models.Model):
     uv=models.PositiveIntegerField(default=1)
     content_html=models.TextField(verbose_name='正文html代码',blank=True,editable=False)
     # 文章正文使用Markdown，content_html是用来存储Markdown之后的内容,同时要重写save函数（见下方），editable=False表示不可编辑
+    is_md=models.BooleanField(verbose_name='是否Markdown语法',default=False)
+    # 新增is_md用于使Markdown和ckeditor共存，修改下文中的save
 
     def __str__(self):
         return self.title
@@ -120,8 +122,18 @@ class Post(models.Model):
     def hot_posts(cls):
         return cls.objects.filter(status=cls.STATUS_NORMAL).only('id','title').order_by('-pv')
 
-    def save(self,*args,**kwargs):  # content_html是用来存储content Markdown之后的内容
+    """
+    # content_html是用来存储content Markdown之后的内容
+    def save(self,*args,**kwargs):  
         self.content_html=mistune.markdown(self.content)
+        return super(Post, self).save(*args,**kwargs)
+    """
+    # 重写save使Markdown和CKeditor共存
+    def save(self,*args,**kwargs):
+        if self.is_md:
+            self.content_html=mistune.markdown(self.content)
+        else:
+            self.content_html=self.content
         return super(Post, self).save(*args,**kwargs)
 
     @cached_property
