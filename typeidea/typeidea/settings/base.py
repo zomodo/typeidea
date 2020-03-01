@@ -186,3 +186,6 @@ CKEDITOR_CONFIG={
         'extraPlugins':'codesnippet',   # 配置代码插件
     },
 }
+
+# 修改默认的存储引擎，自定义的storage，给图片加水印
+DEFAULT_FILE_STORAGE='typeidea.storage.WatermarkStorage'
