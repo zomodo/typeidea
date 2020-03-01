@@ -42,6 +42,9 @@ INSTALLED_APPS = [
     'dal',              # django-autocomplete-light模块
     'dal_select2',
 
+    'ckeditor',         # 富文本编辑器
+    'ckeditor_uploader',    # 富文本编辑器中上传图片配置
+
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -162,6 +165,24 @@ STATICFILES_DIRS = [
     os.path.join(BASE_DIR,'themes',THEME,'static'),
 ]
 
+# ckeditor配置图片上传路径
+MEDIA_URL='/media/'
+MEDIA_ROOT=os.path.join(BASE_DIR,'media')
+CKEDITOR_UPLOAD_PATH='article_images'
+
+
 # 导入xadmin之后，可以在这里修改系统名称和footer内容
 XADMIN_TITLE='Typeidea管理后台'
 XADMIN_FOOTER_TITLE='power by zomodo'
+
+
+# 配置ckeditor富文本编辑器的参数
+CKEDITOR_CONFIG={
+    'default':{
+        'toolbar':'full',
+        'height':300,
+        'width':800,
+        'tabSpaces':4,
+        'extraPlugins':'codesnippet',   # 配置代码插件
+    },
+}

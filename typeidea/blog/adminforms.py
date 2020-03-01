@@ -4,6 +4,9 @@
 
 from django import forms
 from dal import autocomplete
+from ckeditor.widgets import CKEditorWidget
+from ckeditor_uploader.widgets import CKEditorUploadingWidget
+
 from .models import Post,Tag,Category
 # 引入了django-autocomplete-light之后继续配置category和tag的展示逻辑
 
@@ -20,6 +23,23 @@ class PostAdminForm(forms.ModelForm):
         widget=autocomplete.ModelSelect2Multiple(url='tag_autocomplete'),
         label='标签',
     )
+
+    """
+    # content添加富文本编辑器，不能添加图片
+    content=forms.CharField(
+        widget=CKEditorWidget,
+        label='正文',
+        required=True,
+    )
+    """
+
+    # content添加富文本编辑器，可以添加图片
+    content=forms.CharField(
+        widget=CKEditorUploadingWidget,
+        label='正文',
+        required=True,
+    )
+
 
     class Meta:
         model=Post

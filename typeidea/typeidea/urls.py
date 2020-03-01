@@ -18,6 +18,10 @@ from django.contrib import admin
 from django.contrib.sitemaps import views as sitemap_views
 import xadmin
 
+from django.conf import settings
+from django.conf.urls import url,include
+from django.conf.urls.static import static
+
 from typeidea.custom_site import custom_site
 from blog import views as blog_view
 from comment import views as comment_view
@@ -56,4 +60,5 @@ urlpatterns = [
     # category和tag的autocomplete配置url
     url(r'^category_autocomplete/$',CategoryAutocomplete.as_view(),name='category_autocomplete'),
     url(r'^tag_autocomplete/$',TagAutocomplete.as_view(),name='tag_autocomplete'),
-]
+    url(r'^ckeditor/',include('ckeditor_uploader.urls')),   # ckeditor配置图片上传
+] + static(settings.MEDIA_URL,document_root=settings.MEDIA_ROOT)    # 配置图片上传路径
