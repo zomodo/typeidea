@@ -31,7 +31,7 @@ from blog.rss import LatestPostFeed     # 订阅接口
 from blog.sitemap import PostSitemap       # 站点地图
 from typeidea.autocomplete import CategoryAutocomplete,TagAutocomplete
 # from blog.apis import post_list,PostList
-from blog.apis import PostViewSet   # api
+from blog.apis import PostViewSet,CategoryViewSet,TagViewSet   # api
 
 """
 urlpatterns = [
@@ -45,7 +45,10 @@ urlpatterns = [
 ]
 """
 router=DefaultRouter()
-router.register(r'post',PostViewSet,basename='api-post')
+router.register(r'post',PostViewSet,basename='api-post')             # 注册文章api的url
+router.register(r'category',CategoryViewSet,basename='api-category') # 注册分类api的url
+router.register(r'tag',TagViewSet,basename='api-tag')                # 注册标签api的url
+
 
 # 利用class-based view改造之后的URL
 urlpatterns = [

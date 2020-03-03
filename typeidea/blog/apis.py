@@ -35,20 +35,49 @@ ListAPIView是指单纯的输出列表，只支持GET请求。
 from rest_framework import viewsets
 from rest_framework.permissions import IsAdminUser
 
-from .models import Post
+from .models import Post,Category,Tag
 from .serializers import PostSerializer,PostDetailSerializer
+from .serializers import CategorySerializer,CategoryDetailSerializer
+from .serializers import TagSerializer,TagDetailSerializer
 
-class PostViewSet(viewsets.ModelViewSet):   # 这里建议用viewsets.ReadOnlyModelViewSet,创建只读接口
+# 这里用viewsets.ReadOnlyModelViewSet创建只读接口;viewsets.ModelViewSet是可读可写的接口
+class PostViewSet(viewsets.ReadOnlyModelViewSet):     # 文章列表api和文章详情api的view层
     queryset = Post.objects.filter(status=Post.STATUS_NORMAL)
-    serializer_class = PostSerializer       # 列表接口的serializer
+    serializer_class = PostSerializer       # 文章列表接口的serializer
     # permission_classes = [IsAdminUser]      # 写入时的权限校验
 
     # 重写获取详情数据的接口retrieve，列表接口和详情接口对应不同的serializer
     def retrieve(self, request, *args, **kwargs):
-        self.serializer_class=PostDetailSerializer   # 详情接口的serializer
+        self.serializer_class=PostDetailSerializer   # 文章详情接口的serializer
         return super(PostViewSet, self).retrieve(request,*args,**kwargs)
 
 """
 /api/post/ 访问api文章列表页
 /api/post/<post_id>/ 访问api文章详情页
+"""
+
+class CategoryViewSet(viewsets.ReadOnlyModelViewSet):   # 分类列表api和分类详情api的view层
+    queryset = Category.objects.filter(status=Category.STATUS_NORMAL)
+    serializer_class = CategorySerializer       # 分类列表接口的serializer
+
+    def retrieve(self, request, *args, **kwargs):
+        self.serializer_class=CategoryDetailSerializer  # 分类详情接口的serializer
+        return super(CategoryViewSet, self).retrieve(request,*args,**kwargs)
+
+"""
+/api/category/ 访问api分类列表页
+/api/category/<category_id>/ 访问api分类详情页
+"""
+
+class TagViewSet(viewsets.ReadOnlyModelViewSet):       # 标签列表api和标签详情api的view层
+    queryset = Tag.objects.filter(status=Tag.STATUS_NORMAL)
+    serializer_class = TagSerializer        # 标签列表接口的serializer
+
+    def retrieve(self, request, *args, **kwargs):
+        self.serializer_class=TagDetailSerializer       # 标签详情接口的serializer
+        return super(TagViewSet, self).retrieve(request,*args,**kwargs)
+
+"""
+/api/tag/ 访问api标签列表页
+/api/tag/<tag_id>/ 访问api标签详情页
 """
