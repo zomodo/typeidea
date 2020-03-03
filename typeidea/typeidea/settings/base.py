@@ -45,6 +45,8 @@ INSTALLED_APPS = [
     'ckeditor',         # 富文本编辑器
     'ckeditor_uploader',    # 富文本编辑器中上传图片配置
 
+    'rest_framework',       # 引入django-rest-framework
+
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -189,3 +191,9 @@ CKEDITOR_CONFIG={
 
 # 修改默认的存储引擎，自定义的storage，给图片加水印
 DEFAULT_FILE_STORAGE='typeidea.storage.WatermarkStorage'
+
+# django-rest-framework配置
+REST_FRAMEWORK = {
+ 'DEFAULT_SCHEMA_CLASS': 'rest_framework.schemas.coreapi.AutoSchema',
+    # 新版的 schema_class默认用的是rest_framework.schemas.openapi.AutoSchema
+}

@@ -16,11 +16,12 @@ Including another URLconf
 from django.conf.urls import url
 from django.contrib import admin
 from django.contrib.sitemaps import views as sitemap_views
-import xadmin
-
 from django.conf import settings
 from django.conf.urls import url,include
 from django.conf.urls.static import static
+import xadmin
+from rest_framework.routers import DefaultRouter    # 配置api的url
+from rest_framework.documentation import include_docs_urls
 
 from typeidea.custom_site import custom_site
 from blog import views as blog_view
@@ -29,7 +30,8 @@ from config import views as config_view
 from blog.rss import LatestPostFeed     # 订阅接口
 from blog.sitemap import PostSitemap       # 站点地图
 from typeidea.autocomplete import CategoryAutocomplete,TagAutocomplete
-
+# from blog.apis import post_list,PostList
+from blog.apis import PostViewSet   # api
 
 """
 urlpatterns = [
@@ -42,6 +44,9 @@ urlpatterns = [
     url(r'^links/$',config_view.links,name='links'),
 ]
 """
+router=DefaultRouter()
+router.register(r'post',PostViewSet,basename='api-post')
+
 # 利用class-based view改造之后的URL
 urlpatterns = [
     # url(r'^super_admin/',admin.site.urls),  # xadmin不支持多个site配置
@@ -61,4 +66,10 @@ urlpatterns = [
     url(r'^category_autocomplete/$',CategoryAutocomplete.as_view(),name='category_autocomplete'),
     url(r'^tag_autocomplete/$',TagAutocomplete.as_view(),name='tag_autocomplete'),
     url(r'^ckeditor/',include('ckeditor_uploader.urls')),   # ckeditor配置图片上传
+    # url(r'^api/post/',PostList.as_view(),name='post-list'),
+    # url(r'^api/post/',post_list,name='post-list'),
+    url(r'^api/',include(router.urls,namespace='api')), # api
+    url(r'^api/docs/',include_docs_urls(title='typeidea apis')),    # api文档
+
+
 ] + static(settings.MEDIA_URL,document_root=settings.MEDIA_ROOT)    # 配置图片上传路径
