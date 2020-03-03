@@ -36,12 +36,17 @@ from rest_framework import viewsets
 from rest_framework.permissions import IsAdminUser
 
 from .models import Post
-from .serializers import PostSerializer
+from .serializers import PostSerializer,PostDetailSerializer
 
 class PostViewSet(viewsets.ModelViewSet):   # 这里建议用viewsets.ReadOnlyModelViewSet,创建只读接口
     queryset = Post.objects.filter(status=Post.STATUS_NORMAL)
-    serializer_class = PostSerializer
+    serializer_class = PostSerializer       # 列表接口的serializer
     # permission_classes = [IsAdminUser]      # 写入时的权限校验
+
+    # 重写获取详情数据的接口retrieve，列表接口和详情接口对应不同的serializer
+    def retrieve(self, request, *args, **kwargs):
+        self.serializer_class=PostDetailSerializer   # 详情接口的serializer
+        return super(PostViewSet, self).retrieve(request,*args,**kwargs)
 
 """
 /api/post/ 访问api文章列表页

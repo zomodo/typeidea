@@ -194,6 +194,10 @@ DEFAULT_FILE_STORAGE='typeidea.storage.WatermarkStorage'
 
 # django-rest-framework配置
 REST_FRAMEWORK = {
- 'DEFAULT_SCHEMA_CLASS': 'rest_framework.schemas.coreapi.AutoSchema',
     # 新版的 schema_class默认用的是rest_framework.schemas.openapi.AutoSchema
+    'DEFAULT_SCHEMA_CLASS': 'rest_framework.schemas.coreapi.AutoSchema',
+
+    # 配置api数据分页
+    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.LimitOffsetPagination',
+    'PAGE_SIZE': 5,
 }
