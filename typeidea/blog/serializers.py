@@ -25,7 +25,8 @@ class PostSerializer(serializers.ModelSerializer):  # 文章列表接口
 
     class Meta:
         model=Post
-        fields=['id','title','category','tag','owner','created_time']
+        # 文章列表fields中加入url，文章列表页中将返回文章详情页的url
+        fields=['url','id','title','category','tag','owner','created_time']
 
 class PostDetailSerializer(PostSerializer):    # 文章详情接口，继承PostSerializer
     class Meta:
@@ -36,7 +37,8 @@ class PostDetailSerializer(PostSerializer):    # 文章详情接口，继承Post
 class CategorySerializer(serializers.ModelSerializer):  # 分类列表接口
     class Meta:
         model=Category
-        fields=['id','name','created_time']
+        # 分类列表fields中加入url，分类列表页中将返回分类详情页的url
+        fields=['url','id','name','created_time']
 
 class CategoryDetailSerializer(CategorySerializer):    # 分类详情接口，获取分类下的文章列表，继承上方
     posts=serializers.SerializerMethodField('category_paginated_posts')
@@ -65,7 +67,8 @@ category_paginated_posts中实现了对分类下的文章列表获取和分页�
 class TagSerializer(serializers.ModelSerializer):       # 标签列表接口
     class Meta:
         model=Tag
-        fields=['id','name','created_time']
+        # 标签列表fields中加入url，标签列表页中将返回标签详情页的url
+        fields=['url','id','name','created_time']
 
 class TagDetailSerializer(TagSerializer):       # 标签详情接口，获取标签下的文章列表，继承上方
     posts=serializers.SerializerMethodField('tag_paginated_posts')

@@ -45,9 +45,9 @@ urlpatterns = [
 ]
 """
 router=DefaultRouter()
-router.register(r'post',PostViewSet,basename='api-post')             # 注册文章api的url
-router.register(r'category',CategoryViewSet,basename='api-category') # 注册分类api的url
-router.register(r'tag',TagViewSet,basename='api-tag')                # 注册标签api的url
+router.register(r'post',PostViewSet)             # 注册文章api的url
+router.register(r'category',CategoryViewSet)     # 注册分类api的url
+router.register(r'tag',TagViewSet)               # 注册标签api的url
 
 
 # 利用class-based view改造之后的URL
@@ -71,7 +71,7 @@ urlpatterns = [
     url(r'^ckeditor/',include('ckeditor_uploader.urls')),   # ckeditor配置图片上传
     # url(r'^api/post/',PostList.as_view(),name='post-list'),
     # url(r'^api/post/',post_list,name='post-list'),
-    url(r'^api/',include(router.urls,namespace='api')), # api
+    url(r'^api/',include(router.urls)), # api
     url(r'^api/docs/',include_docs_urls(title='typeidea apis')),    # api文档
 
 
