@@ -114,8 +114,11 @@ class Post(models.Model):
         return category,post_list
 
     @classmethod
-    def latest_post(cls):
+    def latest_post(cls,with_related=True):
+        # with_related控制返回的数据是否加上两个外键，如果不需要使用owner和category，则在要用的地方加上with_related=False
         queryset=cls.objects.filter(status=cls.STATUS_NORMAL)
+        if with_related:
+            queryset = queryset.select_related('owner','category').prefetch_related('tag')
         return queryset
 
     @classmethod

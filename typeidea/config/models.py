@@ -75,15 +75,15 @@ class SlideBar(models.Model):
             result=self.content
 
         elif self.display_type==self.DISPLAY_LATEST:
-            context={'post_list':Post.latest_post()}
+            context={'post_list':Post.latest_post(with_related=False)[:5]}
             result=render_to_string('config/blocks/sidebar_posts.html',context)
 
         elif self.display_type==self.DISPLAY_HOT:
-            context={'post_list':Post.hot_posts()}
+            context={'post_list':Post.hot_posts()[:5]}
             result=render_to_string('config/blocks/sidebar_posts.html',context)
 
         elif self.display_type==self.DISPLAY_COMMENT:
-            context={'comments':Comment.objects.filter(status=Comment.STATUS_NORMAL)}
+            context={'comments':Comment.objects.filter(status=Comment.STATUS_NORMAL)[:5]}
             result=render_to_string('config/blocks/sidebar_comments.html',context)
 
         return result

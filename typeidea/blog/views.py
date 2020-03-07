@@ -74,13 +74,13 @@ from comment.forms import CommentForm   # 导入评论中的Form输入框渲染�
 class CommonViewMixin:      # 顶部导航、底部导航、侧边栏通用数据
     # get_context_data接口：获取渲染到模板中的所有上下文，如果有新增数据需要传递到模板中，可以重写该方法来完成
     def get_context_data(self,**kwargs):
-        context=super(CommonViewMixin, self).get_context_data(**kwargs)
+        context=super().get_context_data(**kwargs)
         context.update({'sidebars':SlideBar.get_all()})
         context.update(models.Category.get_navs())
         return context
 
 class IndexView(CommonViewMixin,ListView):      # 首页数据
-    queryset = models.Post.latest_post()
+    queryset = models.Post.latest_post(with_related=True)
     paginate_by = 5     # 分页
     context_object_name = 'post_list'       # 设置模板中的变量
     template_name = 'blog/list.html'
@@ -114,7 +114,7 @@ class TagView(IndexView):        # 标签数据，继承IndexView
         return queryset.filter(tag__id=tag_id)
 
 class PostDetailView(CommonViewMixin,DetailView):   # 文章详情页数据
-    queryset = models.Post.latest_post()
+    queryset = models.Post.latest_post(with_related=True)
     template_name = 'blog/detail.html'
     context_object_name = 'post_detail'
     pk_url_kwarg = 'post_id'
@@ -148,7 +148,7 @@ class PostDetailView(CommonViewMixin,DetailView):   # 文章详情页数据
 
         if not cache.get(uv_key):
             increase_uv=True
-            cache.set(pv_key, 1, 24*60*60)    # 24小时有效
+            cache.set(uv_key, 1, 24*60*60)    # 24小时有效
 
         if increase_pv and increase_uv:
             models.Post.objects.filter(pk=self.object.id).update(pv=F('pv')+1,uv=F('uv')+1)

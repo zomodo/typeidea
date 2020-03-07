@@ -74,5 +74,11 @@ urlpatterns = [
     url(r'^api/',include(router.urls)), # api
     url(r'^api/docs/',include_docs_urls(title='typeidea apis')),    # api文档
 
-
 ] + static(settings.MEDIA_URL,document_root=settings.MEDIA_ROOT)    # 配置图片上传路径
+
+# 意思是当DEBUG=True时候引入django-debug-toolbar的debug_toolbar，并配置对应的URL地址
+if settings.DEBUG:
+    import debug_toolbar
+    urlpatterns += [
+        url(r'^__debug__/',include(debug_toolbar.urls)),
+    ]
