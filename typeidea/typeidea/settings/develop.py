@@ -1,9 +1,8 @@
 # Author : zmd
 # Date : 2019/12/6 17:09
-# Desc :
+# Desc :配置开发环境设置
 
 from .base import *
-
 
 DEBUG=True
 
@@ -13,6 +12,20 @@ DATABASES = {
         'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
     }
 }
+
+# 配置MySQL数据库
+# DATABASES = {
+#     'default':{
+#         'ENGINE':'django.db.backends.mysql',
+#         'NAME':'typeidea_db',
+#         'USER':'root',
+#         'PASSWORD':'123456',
+#         'HOST':'127.0.0.1',
+#         'PORT':'3306',
+#         'CONN_MAX_AGE':5*60,
+#         'OPTIONS':{'charset':'utf8mb4'},
+#     },
+# }
 
 # 之所以在develop.py中增加，因为该工具只能在开发和测试阶段使用
 # 并且django-debug-toolbar只有在DEBUG=True时才会生效
