@@ -19,6 +19,7 @@ from django.contrib.sitemaps import views as sitemap_views
 from django.conf import settings
 from django.conf.urls import url,include
 from django.conf.urls.static import static
+from django.views.decorators.cache import cache_page    # 引入缓存模块
 import xadmin
 from rest_framework.routers import DefaultRouter    # 配置api的url
 from rest_framework.documentation import include_docs_urls
@@ -63,8 +64,10 @@ urlpatterns = [
     url(r'^search/$',blog_view.SearchView.as_view(),name='search'),
     url(r'^author/(?P<author_id>(\d+))/$',blog_view.AuthorView.as_view(),name='author'),
     url(r'^comment/$',comment_view.CommentView.as_view(),name='comment'),
-    url(r'^rss|feed/',LatestPostFeed(),name='rss'),
-    url(r'^sitemap\.xml$',sitemap_views.sitemap,{'sitemaps':{'posts':PostSitemap}}),
+    url(r'^rss|feed/',LatestPostFeed(),name='rss'),     # 订阅接口，|表示或
+    # url(r'^sitemap.xml$',sitemap_views.sitemap,{'sitemaps':{'posts':PostSitemap}}),   # 站点地图
+    # 上面是正常的站点地图配置，下面是加了缓存之后的站点地图配置，20分钟内django会直接读取缓存中的数据
+    url(r'^sitemap.xml$',cache_page(60*20,key_prefix='sitemap_cache_')(sitemap_views.sitemap),{'sitemaps':{'posts':PostSitemap}}),
     # category和tag的autocomplete配置url
     url(r'^category_autocomplete/$',CategoryAutocomplete.as_view(),name='category_autocomplete'),
     url(r'^tag_autocomplete/$',TagAutocomplete.as_view(),name='tag_autocomplete'),

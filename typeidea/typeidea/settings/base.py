@@ -201,3 +201,57 @@ REST_FRAMEWORK = {
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.LimitOffsetPagination',
     'PAGE_SIZE': 5,
 }
+
+# django自带的几种缓存配置
+
+# local-memory caching:内存缓存
+# CACHES = {
+#     'default':{
+#         'BACKEND':'django.core.cache.backends.locmem.LocMemCache',
+#         'LOCATION':'unique-snowflake',
+#     },
+# }
+
+# filesystem caching:文件系统缓存
+# CACHES = {
+#     'default':{
+#         'BACKEND':'django.core.cache.backends.filebased.FileBasedCache',
+#         'LOCATION':'/var/tmp/django_cache',
+#     },
+# }
+
+# database caching:数据库缓存
+# CACHES = {
+#     'default':{
+#         'BACKEND':'django.core.cache.backends.db.DatabaseCache',
+#         'LOCATION':'my_cache_table',
+#     },
+# }
+
+# memcached:分布式缓存，django推荐的缓存系统
+# CACHES = {
+#     'default':{
+#         'BACKEND':'django.core.cache.backends.memcached.MemcachedCache',
+#         'LOCATION':[
+#             '172.19.26.240:11211',
+#             '172.19.26.242:11211',
+#         ],
+#     },
+# }
+
+# 第三方缓存插件-Redis
+# REDIS_URL = '127.0.0.1:6379:1'
+#
+# CACHES = {
+#     'default':{
+#         'BACKEND':'django_redis.cache.RedisCache',
+#         'LOCATION':REDIS_URL,
+#         'TIMEOUT':300,
+#         'OPTIONS':{
+#             'PASSWORD':'******',    # 对应密码
+#             'CLIENT_CLASS':'django_redis.client.DefaultClient',
+#             'PARSER_CLASS':'redis.connection.HiredisParser',
+#         },
+#         'CONNECTION_POOL_CLASS':'redis.connection.BlockingConnectionPool',
+#     },
+# }
