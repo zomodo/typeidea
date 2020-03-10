@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
+from django.core.cache import cache     # 引入缓存，对更新频率不高的数据可以加缓存
 import mistune  # 配置Markdown
 from django.utils.functional import cached_property
 # Create your models here.
@@ -121,9 +122,17 @@ class Post(models.Model):
             queryset = queryset.select_related('owner','category').prefetch_related('tag')
         return queryset
 
+    # @classmethod
+    # def hot_posts(cls):
+    #     return cls.objects.filter(status=cls.STATUS_NORMAL).only('id','title').order_by('-pv')
+
     @classmethod
-    def hot_posts(cls):
-        return cls.objects.filter(status=cls.STATUS_NORMAL).only('id','title').order_by('-pv')
+    def hot_posts(cls):      # 给hot_posts增加缓存,对更新频率不高的数据可以加缓存
+        result=cache.get('hot_posts')
+        if not result:
+            result=cls.objects.filter(status=cls.STATUS_NORMAL).only('id','title').order_by('-pv')
+            cache.set('hot_posts',result,10*60)
+        return result
 
     """
     # content_html是用来存储content Markdown之后的内容
