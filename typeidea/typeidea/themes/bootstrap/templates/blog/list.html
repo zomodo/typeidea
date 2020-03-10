@@ -47,6 +47,12 @@
             <a href="?page={{ page_obj.previous_page_number }}">上一页</a>
         {% endif %}
 
+        <!--
+        {% for page in paginator.page_range %}
+            <a href="?page={{ page }}">{{ page }}</a>
+        {% endfor %}
+        -->
+
         Page {{ page_obj.number }} of {{ paginator.num_pages }}.
 
         {% if page_obj.has_next %}
