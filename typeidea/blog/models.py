@@ -94,7 +94,7 @@ class Post(models.Model):
     def get_by_tag(tag_id):
         try:
             tag=Tag.objects.get(id=tag_id)
-        except Post.DoesNotExist:
+        except Tag.DoesNotExist:
             tag=None
             post_list=[]
         else:
