@@ -47,6 +47,8 @@ INSTALLED_APPS = [
 
     'rest_framework',       # 引入django-rest-framework
 
+    'dj_pagination',        # 引入自动分页插件
+
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -57,6 +59,8 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     'blog.middleware.user_id.UserIDMiddleware', # 给访问用户做标记
+
+    'dj_pagination.middleware.PaginationMiddleware', # 自动分页中间件
 
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -82,6 +86,9 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                # 自动分页需要添加的额外两项
+                'django.template.context_processors.i18n',
+                'django.template.context_processors.media',
             ],
         },
     },
@@ -176,6 +183,11 @@ CKEDITOR_UPLOAD_PATH='article_images'
 # 导入xadmin之后，可以在这里修改系统名称和footer内容
 XADMIN_TITLE='Typeidea管理后台'
 XADMIN_FOOTER_TITLE='power by zomodo'
+
+# dj_pagination配置
+# PAGINATION_DEFAULT_PAGINATION=10   # 指定每页数量
+# PAGINATION_DEFAULT_WINDOW=4        # 指定当前页面左右两侧的页数
+# PAGINATION_DEFAULT_ORPHANS=6       # 允许最后一页的最小数量
 
 
 # 配置ckeditor富文本编辑器的参数

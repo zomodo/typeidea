@@ -1,5 +1,9 @@
 {% extends 'blog/base.html' %}
 
+<!-- 引入自动分页，下面可以使用分页对象page_obj或者数据对象post_list,这里分页页码省略，在view中设置 -->
+{% load pagination_tags %}
+{% autopaginate page_obj %}
+
 {% block title %}
 
     {% if tag %}
@@ -40,18 +44,22 @@
         </div>
     {% endfor %}
 
-    <!-- 添加分页内容 -->
+    <!-- 添加分页内容，引入的dj_pagination -->
+    {% paginate %}
+    <!-- 分页结束 -->
+
+    <!-- 注释掉老的分页
     {% if page_obj %}
 
         {% if page_obj.has_previous %}
             <a href="?page={{ page_obj.previous_page_number }}">上一页</a>
         {% endif %}
 
-        <!--
+
         {% for page in paginator.page_range %}
             <a href="?page={{ page }}">{{ page }}</a>
         {% endfor %}
-        -->
+
 
         Page {{ page_obj.number }} of {{ paginator.num_pages }}.
 
@@ -60,6 +68,6 @@
         {% endif %}
 
     {% endif %}
-    <!-- 分页结束 -->
+    end -->
 
 {% endblock %}
