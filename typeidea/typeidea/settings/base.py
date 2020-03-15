@@ -167,7 +167,7 @@ USE_TZ = True
 STATIC_URL = '/static/'
 
 # STATIC_ROOT是配置部署之后的静态资源路径
-STATIC_ROOT = '/tmp/static'
+STATIC_ROOT = os.path.join(BASE_DIR,'static')
 
 # STATICFILES_DIRS是指定静态资源所在的目录，这里的THEME是上方templates模板中定义的
 STATICFILES_DIRS = [
