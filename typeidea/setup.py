@@ -21,7 +21,7 @@ setup(
     include_package_data=True,
 
     install_requires=[
-        'django==1.11.26',
+        'django==1.11.29',
         'dj-pagination==2.4.0',
         'supervisor==4.1.0',
         'xadmin==0.6.1',
